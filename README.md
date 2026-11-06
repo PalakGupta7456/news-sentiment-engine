@@ -8,7 +8,7 @@
 
 An NLP system that runs every hour. It reads world headlines from 10 international outlets, scores their tone with a **RoBERTa transformer**, and groups them into stories using **sentence embeddings, HDBSCAN and class-based TF-IDF** (the approach behind BERTopic). It then publishes an interactive dashboard and ships a **FastAPI** service in Docker.
 
-![Dashboard](docs/screenshot.png)
+![Dashboard](docs/screenshot.jpg)
 
 ## What it shows
 - **The day's mood.** The overall tone (positive minus negative probability) and the negative / neutral / positive mix.
