@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Mood Desk — live news sentiment</title>
+  <meta name="description" content="Transformer models read world headlines from ten outlets every hour, score their tone and group them into stories.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="#">The Mood Desk</a>
+    <p class="meta" id="meta">Reading the wires…</p>
+    <nav><a href="#sources">Outlets</a><a href="#how">How it works</a><a href="https://github.com/PalakGupta7456/news-sentiment-engine">GitHub</a></nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-text">
+        <h1 id="headline">—</h1>
+        <p id="subline"></p>
+      </div>
+      <div class="meter" aria-label="Share of negative, neutral and positive headlines">
+        <div class="bar" id="mix"></div>
+        <div class="mix-legend" id="mix-legend"></div>
+      </div>
+    </section>
+
+    <section class="stories">
+      <h2>Today's stories, by how many outlets carry them</h2>
+      <p class="sub">Headlines are grouped by meaning, not by keywords. Each story is named by the words that set it apart.</p>
+      <div class="story-grid" id="stories"></div>
+    </section>
+
+    <section class="map-sec">
+      <div>
+        <h2>The story map</h2>
+        <p class="sub">Every headline from the last 48 hours, placed by meaning (sentence embeddings projected to 2-D). Colour is tone. Hover for the headline.</p>
+        <div class="tone-scale"><span>Negative</span><i></i><span>Positive</span></div>
+        <p class="sub" id="quality"></p>
+      </div>
+      <div class="chart-box map-box"><canvas id="map" role="img" aria-label="Scatter map of headlines by meaning and tone"></canvas></div>
+    </section>
+
+    <section class="two" id="sources">
+      <div>
+        <h2>Tone by outlet, last 7 days</h2>
+        <p class="sub">Average tone from −1 (all negative) to +1 (all positive). Differences partly reflect which stories each outlet covers.</p>
+        <ol class="outlets" id="outlets"></ol>
+      </div>
+      <div>
+        <h2>Daily tone</h2>
+        <p class="sub">Average tone of everything published each day.</p>
+        <div class="chart-box"><canvas id="daily" role="img" aria-label="Daily average tone"></canvas></div>
+      </div>
+    </section>
+
+    <section class="how" id="how">
+      <h2>How it works</h2>
+      <ol>
+        <li><b>Hourly ingest.</b> A GitHub Actions job reads 10 public RSS feeds. Stories are de-duplicated by canonical link, and one broken feed never stops the run.</li>
+        <li><b>Sentiment.</b> A RoBERTa transformer (<span id="m-sent">cardiffnlp/twitter-roberta-base-sentiment-latest</span>) gives each headline negative, neutral and positive probabilities. Tone is positive minus negative. Each article is scored once.</li>
+        <li><b>Meaning.</b> A sentence-transformer (<span id="m-enc">all-MiniLM-L6-v2</span>) turns headlines into 384-dimensional embeddings.</li>
+        <li><b>Stories.</b> HDBSCAN finds dense groups of headlines without being told how many there are. Class-based TF-IDF names each group, BERTopic-style.</li>
+        <li><b>Serve.</b> This page rebuilds hourly on GitHub Pages. A FastAPI Docker image scores any text and matches it to today's stories.</li>
+      </ol>
+    </section>
+  </main>
+  <footer>Headlines and links belong to their publishers; only titles and RSS summaries are processed. Sentiment models make mistakes, especially with sarcasm and mixed news.</footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
